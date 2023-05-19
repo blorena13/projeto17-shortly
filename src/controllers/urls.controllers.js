@@ -14,9 +14,9 @@ export async function postShorten(req, res) {
 }
 
 export async function getUrlbyId(req, res) {
-    const {id} = req.params;
+    const { id } = req.params;
     try {
-        const urlId = await db.query(`SELECT * FROM urls WHERE id=$1;`,[id]);
+        const urlId = await db.query(`SELECT * FROM urls WHERE id=$1;`, [id]);
         res.status(200).send(urlId.rows[0]);
 
     } catch (err) {
@@ -25,8 +25,17 @@ export async function getUrlbyId(req, res) {
 }
 
 export async function getShortUrl(req, res) {
+    const { shortUrl } = req.params;
     try {
+        const shortOpen = await db.query(`SELECT * FROM urls WHERE shortUrl=$1;`, [shortUrl])
+        if(shortOpen.rows.length === 0){
+            return res.sendStatus(404);
+        }
 
+        const {url, visitCount} = shortOpen.rows[0];
+
+        await db.query(`UPDATE urls SET visitCount=$1 WHERE shortUrl=$2;`,[visitCount + 1, shortUrl]);
+        return res.redirect(url);
     } catch (err) {
         res.status(500).send(err.message);
     }
