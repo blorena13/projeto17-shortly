@@ -42,7 +42,9 @@ export async function getShortUrl(req, res) {
 }
 
 export async function deletebyId(req, res) {
+    const {id} = req.params;
     try {
+        
 
     } catch (err) {
         res.status(500).send(err.message);
