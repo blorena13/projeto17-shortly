@@ -38,9 +38,9 @@ export async function getUsers(req,res) {
 
 async function getShortenedUrls(userId){
     const result = await db.query(` 
-    SELECT id, shortUrl, url, visitCount 
+    SELECT "id", "shortUrl", "url", "visitCount" 
     FROM urls
-    WHERE userId=$1
+    WHERE "userId"=$1
     ;`,[userId]);
 
     const shortenedUrls = result.rows.map(row => {
