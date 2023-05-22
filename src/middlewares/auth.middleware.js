@@ -10,6 +10,9 @@ export async function authValidation(req, res, next) {
         if (user.rows.length === 0) {
             return res.sendStatus(401);
         }
+
+        const userId = user.rows[0].userId;
+        res.locals.userId = userId;
         next();
     } catch (err) {
         res.status(500).send(err.message);

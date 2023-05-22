@@ -5,7 +5,8 @@ export async function postShorten(req, res) {
     const { url } = req.body;
     try {
         const shortUrl = nanoid();
-        await db.query(`INSERT INTO urls (url, shortUrl) VALUES ($1, $2);`, [url, shortUrl]);
+        const userId = res.locals.userId;
+        await db.query(`INSERT INTO urls (url, shortUrl, userId) VALUES ($1, $2, $3);`, [url, shortUrl, userId]);
         res.status(201).send(shortUrl);
 
     } catch (err) {
@@ -44,6 +45,25 @@ export async function getShortUrl(req, res) {
 export async function deletebyId(req, res) {
     const {id} = req.params;
     try {
+        const urlResult = await db.query(`SELECT * FROM url WHERE id=$1;`,[id]);
+        if(urlResult.rows.length === 0){
+            return res.sendStatus(404);
+        }
+        const url=urlResult.rows[0];
+
+        const userResult = await db.query(`SELECT * FROM registered WHERE id=$1;`, [url.userId]);
+        if(userResult.rows.length === 0){
+            return res.sendStatus(404);
+        }
+
+        const user = userResult.rows[0];
+
+        if(user.id !== url.userId){
+            return res.status(401).send('Unauthorized');
+        }
+
+        await db.query(`DELETE FROM url WHERE id=$1;`,[id]);
+        return res.sendStatus(204);
         
 
     } catch (err) {

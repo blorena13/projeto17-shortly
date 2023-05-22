@@ -112,6 +112,7 @@ INSERT INTO public.cadastro VALUES (3, 'Lorena', 'lorena1@driven.com.br', '$2b$1
 --
 
 INSERT INTO public.login VALUES (1, '8ae5eafa-bc34-40fd-a98c-d9e08cd9f528', '2023-05-18 23:27:22.697961');
+INSERT INTO public.login VALUES (2, 'e5e5c3ad-0c1f-4993-933b-284090cfd32c', '2023-05-19 17:03:28.365612');
 
 
 --
@@ -125,7 +126,7 @@ SELECT pg_catalog.setval('public.cadastro_id_seq', 3, true);
 -- Name: login_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.login_id_seq', 1, true);
+SELECT pg_catalog.setval('public.login_id_seq', 2, true);
 
 
 --
