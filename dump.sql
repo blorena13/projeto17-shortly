@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.14 (Ubuntu 12.14-0ubuntu0.20.04.1)
+-- Dumped from database version 12.14
 -- Dumped by pg_dump version 12.14 (Ubuntu 12.14-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
@@ -16,42 +16,39 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public.urls DROP CONSTRAINT IF EXISTS "urls_userId_fkey";
+ALTER TABLE IF EXISTS ONLY public.login DROP CONSTRAINT IF EXISTS "login_userId_fkey";
+ALTER TABLE IF EXISTS ONLY public.urls DROP CONSTRAINT IF EXISTS urls_pkey;
+ALTER TABLE IF EXISTS ONLY public.registered DROP CONSTRAINT IF EXISTS registered_pkey;
+ALTER TABLE IF EXISTS ONLY public.registered DROP CONSTRAINT IF EXISTS registered_email_key;
+ALTER TABLE IF EXISTS ONLY public.login DROP CONSTRAINT IF EXISTS login_pkey;
+ALTER TABLE IF EXISTS public.urls ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.registered ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.login ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS public.urls_id_seq;
+DROP TABLE IF EXISTS public.urls;
+DROP SEQUENCE IF EXISTS public.registered_id_seq;
+DROP TABLE IF EXISTS public.registered;
+DROP SEQUENCE IF EXISTS public.login_id_seq;
+DROP TABLE IF EXISTS public.login;
+DROP SCHEMA IF EXISTS public;
+--
+-- Name: public; Type: SCHEMA; Schema: -; Owner: -
+--
+
+CREATE SCHEMA public;
+
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
-
---
--- Name: cadastro; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.cadastro (
-    id integer NOT NULL,
-    name text NOT NULL,
-    email text NOT NULL,
-    password text NOT NULL,
-    "createdAt" timestamp without time zone DEFAULT now()
-);
-
-
---
--- Name: cadastro_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.cadastro_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: cadastro_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.cadastro_id_seq OWNED BY public.cadastro.id;
-
 
 --
 -- Name: login; Type: TABLE; Schema: public; Owner: -
@@ -60,7 +57,8 @@ ALTER SEQUENCE public.cadastro_id_seq OWNED BY public.cadastro.id;
 CREATE TABLE public.login (
     id integer NOT NULL,
     token text NOT NULL,
-    "createdAt" timestamp without time zone DEFAULT now()
+    "createdAt" timestamp without time zone DEFAULT now(),
+    "userId" integer
 );
 
 
@@ -85,10 +83,70 @@ ALTER SEQUENCE public.login_id_seq OWNED BY public.login.id;
 
 
 --
--- Name: cadastro id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: registered; Type: TABLE; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.cadastro ALTER COLUMN id SET DEFAULT nextval('public.cadastro_id_seq'::regclass);
+CREATE TABLE public.registered (
+    id integer NOT NULL,
+    name text NOT NULL,
+    email text NOT NULL,
+    password text NOT NULL,
+    "createdAt" timestamp without time zone DEFAULT now()
+);
+
+
+--
+-- Name: registered_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.registered_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: registered_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.registered_id_seq OWNED BY public.registered.id;
+
+
+--
+-- Name: urls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.urls (
+    id integer NOT NULL,
+    "shortUrl" text NOT NULL,
+    url text NOT NULL,
+    "visitCount" integer NOT NULL,
+    "userId" integer NOT NULL,
+    "createdAt" timestamp without time zone DEFAULT now()
+);
+
+
+--
+-- Name: urls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.urls_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: urls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.urls_id_seq OWNED BY public.urls.id;
 
 
 --
@@ -99,42 +157,57 @@ ALTER TABLE ONLY public.login ALTER COLUMN id SET DEFAULT nextval('public.login_
 
 
 --
--- Data for Name: cadastro; Type: TABLE DATA; Schema: public; Owner: -
+-- Name: registered id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-INSERT INTO public.cadastro VALUES (1, 'João', 'joao@driven.com.br', 'driven', '2023-05-18 22:30:59.329444');
-INSERT INTO public.cadastro VALUES (2, 'Lorena', 'lorena@driven.com.br', 'batata', '2023-05-18 22:47:01.484347');
-INSERT INTO public.cadastro VALUES (3, 'Lorena', 'lorena1@driven.com.br', '$2b$10$lPdhXOE3mLMoGA0Cb9NDFep5fCyP7drYbfSM8sX3Xy1QBFqwJqLlq', '2023-05-18 22:52:30.24421');
+ALTER TABLE ONLY public.registered ALTER COLUMN id SET DEFAULT nextval('public.registered_id_seq'::regclass);
+
+
+--
+-- Name: urls id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.urls ALTER COLUMN id SET DEFAULT nextval('public.urls_id_seq'::regclass);
 
 
 --
 -- Data for Name: login; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.login VALUES (1, '8ae5eafa-bc34-40fd-a98c-d9e08cd9f528', '2023-05-18 23:27:22.697961');
-INSERT INTO public.login VALUES (2, 'e5e5c3ad-0c1f-4993-933b-284090cfd32c', '2023-05-19 17:03:28.365612');
 
 
 --
--- Name: cadastro_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Data for Name: registered; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.cadastro_id_seq', 3, true);
+INSERT INTO public.registered VALUES (1, 'Lorena', 'lorena1@driven.com.br', '$2b$10$A0q0HpE9u.0k2Dr3y7lDuOOUWDxSXpK04A0Uzp2aLldgMdKGTCsuC', '2023-05-22 20:29:51.605238');
+
+
+--
+-- Data for Name: urls; Type: TABLE DATA; Schema: public; Owner: -
+--
+
 
 
 --
 -- Name: login_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.login_id_seq', 2, true);
+SELECT pg_catalog.setval('public.login_id_seq', 1, false);
 
 
 --
--- Name: cadastro cadastro_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: registered_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.cadastro
-    ADD CONSTRAINT cadastro_pkey PRIMARY KEY (id);
+SELECT pg_catalog.setval('public.registered_id_seq', 1, true);
+
+
+--
+-- Name: urls_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.urls_id_seq', 1, false);
 
 
 --
@@ -143,6 +216,46 @@ ALTER TABLE ONLY public.cadastro
 
 ALTER TABLE ONLY public.login
     ADD CONSTRAINT login_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: registered registered_email_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registered
+    ADD CONSTRAINT registered_email_key UNIQUE (email);
+
+
+--
+-- Name: registered registered_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.registered
+    ADD CONSTRAINT registered_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: urls urls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.urls
+    ADD CONSTRAINT urls_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: login login_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.login
+    ADD CONSTRAINT "login_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.registered(id);
+
+
+--
+-- Name: urls urls_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.urls
+    ADD CONSTRAINT "urls_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.registered(id);
 
 
 --
