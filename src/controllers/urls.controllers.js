@@ -7,7 +7,12 @@ export async function postShorten(req, res) {
         const shortUrl = nanoid();
         const userId = res.locals.userId;
         await db.query(`INSERT INTO urls ("url", "shortUrl", "userId") VALUES ($1, $2, $3);`, [url, shortUrl, userId]);
-        res.status(201).send(shortUrl);
+        const idUrl = await db.query(`SELECT * FROM urls;`)
+        const result = {
+            id: idUrl.id,
+            shortUrl: shortUrl
+        }
+        res.status(201).send(result);
 
     } catch (err) {
         res.status(500).send(err.message);
